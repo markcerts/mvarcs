@@ -1,6 +1,11 @@
 # MVARCS
 
-MVARCS (Mark Verifying Authority Root Certificate Store) is a store for the trusted root certificates involved Mark Certificates (MC) from Mark Verifying Authorities (MVA).
+MVARCS (Mark Verifying Authority Root Certificate Store) is a store for the trusted root certificates involved in Mark Certificates (MC) from Mark Verifying Authorities (MVA).
+
+The [cacert.pem](cacert.pem) file contains the PEM certificates from the MVAs.
+
+Subsequent packages and libraries use this repo as a submodule for packaging up the certificates:
+- [mvarcs-python](https://github.com/markcerts/mvarcs-python)
 
 This store is inspired by the similar [Certifi.io](https://certifi.io/) used for TLS certificates.
 
