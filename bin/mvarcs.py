@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives import hashes
 
 known_mva_root_certificates = {
     "DigiCert": "https://cacerts.digicert.com/DigiCertVerifiedMarkRootCA.crt.pem",
-    "Entrust": "https://bimigroup.org/certs/entrust_vmc_specific.pem",
+    "Entrust": "https://web.entrust.com/root-certificates/VMRC1.cer",
 }
 
 
