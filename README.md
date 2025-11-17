@@ -27,5 +27,6 @@ This tool and the certificates are provided "as is" without any warranties. Use 
 
 ## Terms and Conditions
 The author(s) are not responsible for any damage or loss caused by the use of this tool or certificates.  
-Inclusion of certificates here does not guarantee that an provider will honor your MCs.
+Inclusion of certificates here does not guarantee that a provider will honor your MCs.
+
 
