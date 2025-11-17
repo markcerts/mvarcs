@@ -6,6 +6,7 @@ The [cacert.pem](cacert.pem) file contains the PEM certificates from the MVAs.
 
 Subsequent packages and libraries use this repo as a submodule for packaging up the certificates:
 - [mvarcs-python](https://github.com/markcerts/mvarcs-python)
+- [mvarcs-nodejs](https://github.com/markcerts/mvarcs-nodejs)
 
 This store is inspired by the similar [Certifi.io](https://certifi.io/) used for TLS certificates.
 
@@ -27,3 +28,4 @@ This tool and the certificates are provided "as is" without any warranties. Use 
 ## Terms and Conditions
 The author(s) are not responsible for any damage or loss caused by the use of this tool or certificates.  
 Inclusion of certificates here does not guarantee that an provider will honor your MCs.
+
