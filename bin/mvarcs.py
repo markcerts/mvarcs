@@ -4,12 +4,34 @@ import json
 import requests
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 
 known_mva_root_certificates = {
     "DigiCert": "https://cacerts.digicert.com/DigiCertVerifiedMarkRootCA.crt.pem",
+    "DigiCert_bimigroup": "https://bimigroup.org/certs/digicert.pem",
+    "GlobalSign": "https://secure.globalsign.com/cacert/gsverifiedmarkrootr42.crt",
     "Entrust": "https://web.entrust.com/root-certificates/VMRC1.cer",
+    "SSL.com_RSA": "https://ssl.com/repo/certs/SSL.com-VMC-Root-2024-RSA.pem",
+    "SSL.com_E1": "https://ssl.com/repo/certs/SSL.com-VMC-I-E1.pem",
+    "SSL.com_R1": "https://ssl.com/repo/certs/SSL.com-VMC-I-R1.pem"
 }
+
+
+def convert_crt_to_pem(crt_bytes):
+    """
+    Converts a CRT certificate to PEM format.
+
+    Args:
+        crt_bytes (bytes): The CRT certificate bytes.
+
+    Returns:
+        bytes: The PEM formatted certificate bytes.
+    """
+    # Load the CRT certificate
+    crt = x509.load_der_x509_certificate(crt_bytes, default_backend())
+    # Convert to PEM format
+    pem_bytes = crt.public_bytes(encoding=serialization.Encoding.PEM)
+    return pem_bytes
 
 
 def fetch_from_url(pem_url):
@@ -30,16 +52,19 @@ def fetch_from_url(pem_url):
         ValueError: If the request fails, the response is empty, or the
                     content is not a valid PEM certificate.
     """
-    pem_response = requests.get(pem_url)
-    if not pem_response.ok:
+    response = requests.get(pem_url)
+    if not response.ok:
         raise ValueError(
-            f"Failed to fetch certificate. Status code: {pem_response.status_code}"
+            f"Failed to fetch certificate. Status code: {response.status_code}"
         )
-    if not pem_response.content:
+    if not response.content:
         raise ValueError("No certificate content.")
-    if b"BEGIN CERTIFICATE" not in pem_response.content:
+    content = response.content
+    if pem_url.endswith(".crt"):
+        content = convert_crt_to_pem(content)
+    if b"BEGIN CERTIFICATE" not in content:
         raise ValueError("Invalid certificate content.")
-    return pem_response.content
+    return content
 
 
 def get_last_in_chain(pem_bytes):
@@ -170,12 +195,20 @@ def fetch_and_format_cert(obj=None, as_dict=False, as_json=False):
             f'# SHA256 Fingerprint: {cert_obj["fingerprint_sha256"]}',
             pem_bytes.decode("utf-8"),
         ]
-    )
+    ).strip()
 
-    return txt_string
+    return txt_string, cert_obj["serial_hex"]
 
 
 if __name__ == "__main__":
+    print("Fetching MVA root certificates...")
+    cert_text = ""
     for cert_name, cert_url in known_mva_root_certificates.items():
-        cert_txt = fetch_and_format_cert(cert_url)
-        print(cert_txt)
+        print(f" ...fetching {cert_url}")
+        _response_cert, cert_serial = fetch_and_format_cert(cert_url)
+        if cert_serial and cert_serial not in cert_text:
+            cert_text += "\n\n" + _response_cert
+        else:
+            print(f" ...skipping {cert_url} (already fetched #{cert_serial})")
+    print("Finished. Full cacert.pem:\n\n")
+    print(cert_text.strip())
